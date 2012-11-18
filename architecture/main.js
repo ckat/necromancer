@@ -25,7 +25,8 @@ var eventCore = (new function() {
 	this.registerPlugins = function(plugin) {
 		plugins[plugin.name] = plugin;
 		registerMethods(plugin);
-		
+		//TODO do something with methods
+		//TODO do something with listeners
 	};
 	return this;
 });
