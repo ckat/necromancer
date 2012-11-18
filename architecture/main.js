@@ -2,7 +2,7 @@
  * Core of game. Includes only methods to work with plugins.
  * @author Ramil_Karimov@epam.com
  */
-var eventCore = (new function() {
+var eventCore = (function() {
 	var plugins = {};
 	var createMethodHandler = function (methodName) {
 		return function () {
@@ -22,7 +22,7 @@ var eventCore = (new function() {
 			}
 		}
 	};
-	this.registerPlugins = function(plugin) {
+	this.registerPlugin = function(plugin) {
 		plugins[plugin.name] = plugin;
 		registerMethods(plugin);
 		//TODO do something with methods
