@@ -1,11 +1,28 @@
 <html>
 	<head>
-		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="jquery-1.7.1.js"></script>
 		<script type="text/javascript" src="underscope.js"></script>
 		<script type="text/javascript" src="backbone.js"></script>
-		<script type="text/javascript" src="game.js"></script>
+		<script type="text/javascript" src="core.js"></script>
+		<script type="text/javascript" src="templates.js"></script>
+		<script type="text/javascript" src="objects.js"></script>
+		<script type="text/javascript" src="interactions.js"></script>
+		<script type="text/javascript" src="projection.js"></script>
+		<<script type="text/javascript">
+			$(function() {
+				var game = gameCore.generateGame($("map").html().trim(), $("#block"));
+				game.startGame();
+			});
+		</script>
 	</head>
 	<body>
-		
+		<pre id="block">
+		</pre>
+		<pre id="map">
+xxxxxxxxxxxxxx
+x x   x   x  x
+x u x   x   xx
+xxxxxxxxxxxxxx
+		</pre>
 	</body>
 </html>
