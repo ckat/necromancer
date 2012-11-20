@@ -20,15 +20,12 @@ var gameCore = {
 			interactions: this.interactions,
 			startGame: function() {
 				(function() {
-					var newObjects = _.reduce(
-						this.interactions, 
+					var newObjects = _.reduce(this.interactions, 
 						function(newObjects, interaction) {
 							var proceeded = interaction.proceed(this.objects);
 							this.objects = _.without(this.objects, proceeded);
 							return newObjects.concat(proceeded);
-						}, 
-						[]
-					);
+						},[]);
 					this.objects = this.objects.concat(newObjects);
 					this.projection.show(this.objects);
 					setTimeout(_.bind(arguments.callee, this), 200);
@@ -36,5 +33,16 @@ var gameCore = {
 				
 			},
 		}
+	}
+};
+/**
+ * base object for interactions
+ */
+var interactionBase = {
+	name: undefined,
+	template:[],
+	handler:undefined,
+	proceed: function(objects) {
+
 	}
 };
