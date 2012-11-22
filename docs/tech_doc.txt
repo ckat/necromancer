@@ -136,8 +136,9 @@ Unit = { // базовый класс для всех персонажей
 	nx, nx : int, // куда перемещается персонаж	
 	cx, cy: float, // координаты персонажа для отрисовки
     frameCounter: int // количество отрисованных кадров анимации
-    getAnimation():String // имя файла с анимацией
+    getAnimation():String // имя файла с основной анимацией
     getAnimationFramesCount(): int //   количество кадров для анимации
+	isAnimationWithoutMotionAble(): boolean // возможна ли анимация когда персонаж стоит?
 	 saveCurrentState() // сохранить текущее состояние x = nx, y = ny, обнулить счетчики и т.д.
 }
 
