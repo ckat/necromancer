@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+            <title>Демонстрация</title>
+</head>
+        <body onload="init();" onresize="resize();" >
+            <canvas id="layer1" width="760" height="600" style=" position:absolute; top:0;left:0; visibility: visible;  z-index: 0; solid #c3c3c3;">Your browser does not support the canvas element.</canvas>
+			<canvas id="layer2" width="760" height="600" style="position:absolute; top:0;left:0; visibility: visible;  z-index: 1; solid #c3c3c3;">Your browser does not support the canvas element.</canvas>
+
+			<script type="text/javascript">
+			var ctx;
+			var buff=new Array(2);
+			var ctx=new Array(2);	
+			var current=0;
+			// Начальная точка треугольника
+			var xtre=0;
+			var ytre=0;
+			
+			//рисунок ракеты
+			var img;
+			
+			//рисунок кота
+			var img2;
+			
+			// Загружена картинка
+			var imageReady = false;
+			var imageReady2 = false;
+			
+			// Номер фрейма
+			var frame = 0;
+			// Переключатель фреймов считает количество про рисовок
+			var counter_draw=0
+			
+			// Координаты рисунка кота
+			var x0img2 = 0;
+		  	var y0img2 = 0;
+		  	
+		  	// Направление кота 0 - слева на право, 1 - справа на лево, 2 - сверху вниз, 3 - снизу в верх  
+		  	var direct =0;
+			
+			// Размер одной ячейки на карте
+			var cellSize = 24;
+			// Массив карты поля боя
+			var map = [
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1],
+			    [2, 2, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 2],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+			    ];			
+			
+	
+
+
+			
+			
+			
+			function init(){
+								
+				buff[0]=document.getElementById("layer1");
+				buff[1]=document.getElementById("layer2");
+				
+								
+				resize();
+
+				
+
+				//Raketa
+				img = new Image();  // Создание нового объекта ихображения
+				img.src = 'image.png';  // Путь к изображению которое необходимо нанести на холст
+				img.onload = loaded();
+				
+				// бегущий кот
+				img2 = new Image();
+			    img2.src = 'images/simba6.png';
+			    img2.onload = loaded2();
+				
+				setInterval(draw,10);
+			}
+			
+			
+			function loaded() {
+				  imageReady = true;
+
+			}
+
+			function loaded2() {
+				  imageReady2 = true;
+				  //setTimeout( update, 1000 / 60 );
+			}
+			
+			/*
+			function update() {
+			    draw();
+			    frame++;
+			    if (frame >= 6) frame = 0;
+			    setTimeout( update, 1000 / 60 );
+			}
+			*/
+			
+			
+			
+			function resize() {
+				
+				buff[0].width = 16 * cellSize;
+				buff[0].height = 15 * cellSize;
+				buff[1].width = 16 * cellSize;
+				buff[1].height = 15 * cellSize;
+				
+				drawMap();
+				// На всю страницу 
+				/*
+				buff[0].width = buff[0].parentNode.clientWidth;
+				buff[0].height = buff[0].parentNode.clientHeight;
+				buff[1].width = buff[1].parentNode.clientWidth;
+				buff[1].height = buff[1].parentNode.clientHeight;
+				*/
+			}
+			
+			
+			
+			
+			function drawMap() {
+				ctx= buff[0].getContext('2d');
+				ctx.fillStyle = '#ccc';
+				ctx.fillRect(0, 0, buff[0].width, buff[0].height);
+				ctx.fillStyle = '#000';
+				ctx.fillRect(cellSize, cellSize, 13 * cellSize, 13 * cellSize)
+				// Цикл обрабатывающий массив в котором содержатся значения элементов карты
+				// если попадается 1 то рисуется кирпичный блок
+				// если 2, то бетонная стена
+				for (var j = 0; j < 26; j++)
+					for (var i = 0; i < 26; i++) {
+			    		switch (map[j][i]) {
+			    		case 1:
+			        		DrawBrick(i * cellSize / 2 + cellSize, j * cellSize / 2 + cellSize);
+			        		break;
+			    		case 2:
+			        		DrawHardBrick(i * cellSize / 2 + cellSize, j * cellSize / 2 + cellSize);
+			        		break;
+			    		}
+					}
+				// После прорисовки фона на layer1  преключаемся на прорисовку в layer2
+				ctx= buff[1].getContext('2d');
+			}
+			
+
+			function draw() {
+					    
+					current =1-current;
+					
+					//ctx.globalCompositeOperation = 'destination-over';
+					ctx.clearRect(0,0,760,600);
+										
+					ctx.fillStyle = "#FFA500";
+        			if (current==0) {ctx.strokeStyle = "#0000FF"} else {ctx.strokeStyle = "#FF0000"}
+        			ctx.beginPath()
+        			xtre= xtre+current;
+        			ytre= ytre+current;
+        			ctx.moveTo(0+xtre,0+ytre);
+        			ctx.lineTo(8+xtre,8+ytre);
+        			ctx.lineTo(4+xtre,8+ytre);
+        			ctx.closePath();
+        			ctx.stroke();
+        			
+        			if (imageReady) { ctx.drawImage(img, 100,ytre); }
+        				
+        			if (imageReady2) { 
+        				counter_draw++;
+        				if(counter_draw%10 == 0) {
+        					counter_draw=0;
+        					frame++;
+        		    		if (frame >= 6) { frame = 0; }
+        				}
+        				//ctx.drawImage(img2, buff[1].width/2 - (img2.width/2), buff[1].height/2 - (img2.height/2)); 
+        				//ctx.drawImage(img2, 0, 0, 96, 54, buff[1].width/2 - 48, buff[1].height/2 - 48, 96, 54);
+        			  	//ctx.drawImage(img2, frame*96, 0, 96, 54, buff[1].width/2 - 48, buff[1].height/2 - 48, 96, 54);
+        				
+        			  	
+        			  	
+        			  	//x0img2 =   buff[1].width/2 - 48;
+        			  	x0img2 =   (xtre+current)*2;
+        			  	y0img2 =   (buff[1].height/2 - 48)*2;
+        			  	
+        			  	direct = 3;
+        			  	
+        			  	ctx.save();
+        				ctx.scale(0.5,0.5);
+        				//ctx.drawImage(img2, frame*96, 0, 96, 54, x0img2, y0img2, 96, 54);
+        				
+        				//ctx.drawImage(img2, frame*96, 54, 96, 54, x0img2, y0img2, 96, 54);
+        				
+        				//ctx.drawImage(img2, frame*96, 108, 96, 54, x0img2, y0img2, 96, 54);
+        				
+        				ctx.drawImage(img2, frame*96, direct*54, 96, 54, x0img2, y0img2, 96, 54);
+        				ctx.restore();
+        			  	
+        			  	
+        			  	
+        			  	
+        			  	
+        			  	//setTimeout( update, 1000 / 10 );
+					}				   
+                    
+				}
+			
+			/*
+			function  update() {
+
+			}
+			*/
+			
+			// Рисуем часть кирпичной стены
+			function DrawBrick(x, y) {
+			    // Отрисовка основного цвета кирпича
+			    ctx.fillStyle = '#FFA500';
+			    ctx.fillRect(x, y, cellSize / 2, cellSize / 2);
+			    // Отрисовка теней
+			    ctx.fillStyle = '#CD8500';
+			    ctx.fillRect(x, y, cellSize / 2, cellSize / 16);
+			    ctx.fillRect(x, y + cellSize / 4, cellSize / 2, cellSize / 16);
+			    ctx.fillRect(x + cellSize / 4, y, cellSize / 16, cellSize / 4);
+			    ctx.fillRect(x + cellSize / 16, y + cellSize / 4, cellSize / 16, cellSize / 4);
+			    // Отрисовка раствора между кирпичами
+			    ctx.fillStyle = '#D3D3D3';
+			    ctx.fillRect(x, y + cellSize / 4 - cellSize / 16, cellSize / 2, cellSize / 16);
+			    ctx.fillRect(x, y + cellSize / 2 - cellSize / 16, cellSize / 2, cellSize / 16);
+			    ctx.fillRect(x + cellSize / 4 - cellSize / 16, y, cellSize / 16, cellSize / 4);
+			    ctx.fillRect(x, y + cellSize / 4 - cellSize / 16, cellSize / 16, cellSize / 4);
+			}
+
+			// Рисуем часть бетонного блока
+			function DrawHardBrick(x, y) {
+			    // Отрисовка основного фона
+			    ctx.fillStyle = '#cccccc';
+			    ctx.fillRect(x, y, cellSize / 2, cellSize / 2);
+			    // Отрисовка Тени
+			    ctx.fillStyle = '#909090';
+			    ctx.beginPath();
+			    ctx.moveTo(x, y + cellSize / 2);
+			    ctx.lineTo(x + cellSize / 2, y + cellSize / 2);
+			    ctx.lineTo(x + cellSize / 2, y);
+			    ctx.fill();
+			    // Отрисовка белого прямоугольника сверху
+			    ctx.fillStyle = '#eeeeee';
+			    ctx.fillRect(x + cellSize / 8, y + cellSize / 8, cellSize / 4, cellSize / 4);
+			}
+			
+			
+			
+				
+			</script>
+
+		</body>
+
+
+</html>

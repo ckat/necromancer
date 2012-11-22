@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+            <title>Демонстрация</title>
+            <script src="unit.js"> </script>
+</head>
+        <body onload="init();" onresize="resize();" >
+            <canvas id="layer1" width="760" height="600" style=" position:absolute; top:0;left:0; visibility: visible;  z-index: 0; solid #c3c3c3;">Your browser does not support the canvas element.</canvas>
+			<canvas id="layer2" width="760" height="600" style="position:absolute; top:0;left:0; visibility: visible;  z-index: 1; solid #c3c3c3;">Your browser does not support the canvas element.</canvas>
+
+			<script type="text/javascript">
+			var ctx;
+			var buff=new Array(2);
+			var ctx=new Array(2);	
+			var current=0;
+			
+			// Надо заменить !!!   Начальная точка треугольника
+			var xtre=0;
+			var ytre=0;
+			
+			// Размер одной ячейки на карте
+			var cellSize = 24;
+			
+			//рисунок кота
+			var img2;
+			
+			// Загружена картинка
+			var imageReady2 = false;
+			
+			// Номер фрейма
+			var frame = 0;
+			// Переключатель фреймов считает количество про рисовок
+			var counter_draw=0
+			
+			// Координаты рисунка кота
+			var x0img2 = 0;
+		  	var y0img2 = 0;
+		  	
+		  	// Направление кота 0 - слева на право, 1 - справа на лево, 2 - сверху вниз, 3 - снизу в верх  
+		  	var direct =0;
+		  	
+		  	//Время для следующей прорисовки экрана 10 ms
+			var timeReDrawScreen = 10;
+		  	var myUnit = new Unit();
+	
+			function init(){
+				
+				buff[0]=document.getElementById("layer1");
+				buff[1]=document.getElementById("layer2");
+								
+				resize();
+				
+				// бегущий кот
+				img2 = new Image();             // Создание нового объекта ихображения
+			    img2.src = 'images/simba6.png'; // Путь к изображению которое необходимо нанести на холст
+			    img2.onload = loaded2();
+				
+				setInterval(draw, timeReDrawScreen);
+					
+				setTimeout( update, 1000 );
+				
+			}
+			
+
+			function update() {
+				myUnit.nx = myUnit.x + 1;
+				myUnit.ny = myUnit.y;
+				
+				myUnit.cx = myUnit.x*cellSize
+				myUnit.cy = myUnit.y*cellSize
+				
+				setTimeout( update2, 1000 );	
+			}
+			
+			function update2() {
+				myUnit.x = myUnit.nx; 
+				myUnit.y = myUnit.ny; 				
+				
+				myUnit.cx = myUnit.x*cellSize
+				myUnit.cy = myUnit.y*cellSize
+				
+				setTimeout( update, 1000 );
+			}
+			
+			
+			function loaded2() {
+				  imageReady2 = true;
+			}
+			
+
+			function resize() {
+				
+				buff[0].width = 16 * cellSize;
+				buff[0].height = 15 * cellSize;
+				buff[1].width = 16 * cellSize;
+				buff[1].height = 15 * cellSize;
+				
+				drawMap();
+
+			}
+			
+			
+			
+			
+			function drawMap() {
+				// Прорисовываем фон
+				ctx= buff[0].getContext('2d');
+				
+				ctx.fillStyle = '#ccc';
+				ctx.fillRect(0, 0, buff[0].width, buff[0].height);
+				
+				// После прорисовки фона на layer1  преключаемся на прорисовку в layer2
+				ctx= buff[1].getContext('2d');
+			}
+			
+
+			function draw() {
+					    
+					current =1-current;
+					
+					ctx.clearRect(0,0,760,600);
+										        				
+        			if (imageReady2) { 
+        				
+        				if (myUnit.x != myUnit.nx || myUnit.y != myUnit.ny) {
+
+							counter_draw++;
+							if (counter_draw % 10 == 0) {
+								counter_draw = 0;
+								frame++;
+								if (frame >= 6) {
+									frame = 0;
+								}
+							}
+
+							myUnit.cx = myUnit.cx + (cellSize/myUnit.timepermove)*timeReDrawScreen ;
+							if(myUnit.cx >= myUnit.nx*cellSize) {
+								myUnit.cx = myUnit.nx*cellSize;
+							}
+							
+							//myUnit.cy = myUnit.y*cellSize ;
+							
+						} else { 
+							frame = 0;
+						}
+
+						
+
+						direct = 0;
+
+						//ctx.save();
+						//ctx.scale(0.5, 0.5);
+						console.log(myUnit.cx)
+						//console.log(myUnit.cy)
+						ctx.drawImage(img2, frame * 96, direct * 54, 96, 54,
+								myUnit.cx, myUnit.cy, 48, 27);
+						//ctx.restore();
+
+					}
+
+				}
+			</script>
+
+		</body>
+
+
+</html>
