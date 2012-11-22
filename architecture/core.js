@@ -14,9 +14,11 @@ var gameCore = {
 	 * method returns object, that represents level
 	 */
 	generateGame: function(map, container) {
+		var objects = this.generateObjects(map); 
+		var projection = new this.projectionClass(map, container);
 		return {
-			objects: this.generateObjects(map), 
-			projection: new projectionClass(container),
+			objects: objects, 
+			projection: projection,
 			interactions: this.interactions,
 			startGame: function() {
 				(function() {
@@ -28,11 +30,37 @@ var gameCore = {
 						},[]);
 					this.objects = this.objects.concat(newObjects);
 					this.projection.show(this.objects);
-					setTimeout(_.bind(arguments.callee, this), 200);
+					setTimeout(_.bind(arguments.callee, this), 20000);
 				}).apply(this);
-				
 			},
 		}
+	},
+	generateObjects: function(map) {
+		var result = [];
+		var rows = map.split("\n");
+		for (var rowNumber = 0; rowNumber<rows.length; rowNumber++) {
+			var row = rows[rowNumber];
+			var symbols = row.split("");
+			for (var symbolNumber = 0; symbolNumber< symbols.length; symbolNumber++) {
+				var symbol = symbols[symbolNumber];
+				if (symbol!==' ') {
+					var objectType = this.getTypeFor(symbol);
+					result.push({
+						type: objectType, 
+						direction : (Math.random()*4)%4,
+						x: symbolNumber, 
+						y: rowNumber
+					})
+				}
+			}
+		}
+
+		return result;
+	},
+	getTypeFor: function(symbol) {
+		var types = _.where(this.objectDefinitions, {symbol: symbol});
+		return _.first(types);
+
 	}
 };
 /**
@@ -43,6 +71,6 @@ var interactionBase = {
 	template:[],
 	handler:undefined,
 	proceed: function(objects) {
-
+		
 	}
 };
